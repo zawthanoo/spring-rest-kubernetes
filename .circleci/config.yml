@@ -9,8 +9,9 @@ jobs:
       
     steps:
 
-      - checkout
-
+      - checkout	  
+	  - setup_remote_docker
+	  
       - restore_cache:
           key: spring-rest-helloworld-{{ checksum "pom.xml" }}
       
@@ -28,3 +29,18 @@ jobs:
       
       - store_artifacts:
           path: target/spring-rest-helloworld-0.0.1-SNAPSHOT.jar
+	  
+      - run: 
+          name: remove snapshot version
+          command: |
+            if mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec | grep -q "SNAPSHOT"; then mvn versions:set -DremoveSnapshot; fi;
+            echo $(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)-$(echo $CIRCLE_SHA1 | cut -c -7)-$CIRCLE_BUILD_NUM > tempvers.txt
+            mvn versions:set -DnewVersion=$(cat tempvers.txt) 
+
+	  - run:
+          name: Build application Docker image
+          command: |
+            cp target/*.war docker/app/
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker build --no-cache -t $CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt) docker
+            docker push $CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt)
