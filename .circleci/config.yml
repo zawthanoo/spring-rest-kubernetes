@@ -9,8 +9,9 @@ jobs:
       
     steps:
 
-      - checkout	  
-	  - setup_remote_docker
+      - checkout
+	  
+      - setup_remote_docker
 	  
       - restore_cache:
           key: spring-rest-helloworld-{{ checksum "pom.xml" }}
@@ -37,7 +38,7 @@ jobs:
             echo $(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)-$(echo $CIRCLE_SHA1 | cut -c -7)-$CIRCLE_BUILD_NUM > tempvers.txt
             mvn versions:set -DnewVersion=$(cat tempvers.txt) 
 
-	  - run:
+      - run:
           name: Build application Docker image
           command: |
             cp target/*.war docker/app/
