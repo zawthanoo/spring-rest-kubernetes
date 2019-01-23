@@ -14,6 +14,6 @@ public class ApiController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String hello() {
-		return "API is started....";
+		return "Demo API is started....";
 	}
 }
