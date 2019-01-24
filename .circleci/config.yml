@@ -36,7 +36,7 @@ jobs:
           command: |
               cp target/*.war docker/app/
               docker login -u $DOCKER_USER -p $DOCKER_PASS
-              docker build --no-cache -t $CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt) docker
+              docker build --no-cache -t $DOCKER_USER/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt) docker
               docker push $DOCKER_USER/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt)
           name: "Build application Docker image"
     working_directory: ~/spring-rest-helloworld
