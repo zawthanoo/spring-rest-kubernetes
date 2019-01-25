@@ -1,0 +1,19 @@
+nodes:
+  - address: 192.168.88.77  
+    internal_address: 172.16.22.12
+    user: centos
+    role: [controlplane,worker,etcd]
+  - address: 192.168.88.67
+    internal_address: 172.16.32.37
+    user: centos
+    role: [controlplane,worker,etcd]
+  - address: 192.168.88.78
+    internal_address: 172.16.42.73
+    user: centos
+    role: [controlplane,worker,etcd]
+
+services:
+  etcd:
+    snapshot: true
+    creation: 6h
+    retention: 24h
