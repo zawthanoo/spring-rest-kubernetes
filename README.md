@@ -1,4 +1,4 @@
-# Building docker image for Mule Project using CircleCi
+# Building docker image for Java Maven Project using CircleCi
 
 Before setup, we need to prepare to login [circle](https://circleci.com/vcs-authorize/) with `git` account.
 
@@ -27,7 +27,7 @@ Before setup, we need to prepare to login [circle](https://circleci.com/vcs-auth
 ```
 Here `config.yml` configuration.
 
-Prepare remote build environment to build the project and to create the docker image. As `circleci` supprot the `docker`, build enviroment will be use `docker` as below.  `circleci/openjdk:8-jdk` image already have `maven` with `java`.
+Prepare remote environment to build the project and to create the docker image. As `circleci` support the `docker`, build enviroment will be use `docker` as below.  `circleci/openjdk:8-jdk` image already have `maven` with `java`.
 
 ```yml
 version: 2
@@ -55,7 +55,7 @@ Checkout git project and build remote environment
       - checkout
       - setup_remote_docker
 ```
-Pull/down and cache the dependencies lib. There is no cache for firsttime build. It will be download/pull from public repo(Eg, maven-public)
+Pull/down and cache the dependencies lib. As there is no cache for firsttime build, it will be download/pull from public repo(Eg, maven-public)
 
 ```yml
       # Download and cache dependencies
@@ -78,43 +78,7 @@ save dependencies lib as cache. Next time, it will be pull/down the necessary li
           paths:
             - ~/.m2
 ```
-Build the mule-project using `maven` and deploy artifact without snapshoots, eg, `1.2.3-SNAPSHOT` 
-
-```yml
-     # run maven build and deploy artifact (no snapshots)
-      - run: 
-          name: remove snapshot version
-          command: |
-            if mvn -s .circleci/settings.xml -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec | grep -q "SNAPSHOT"; then mvn versions:set -DremoveSnapshot; fi;
-            echo $(mvn -s .circleci/settings.xml -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)-$(echo $CIRCLE_SHA1 | cut -c -7)-$CIRCLE_BUILD_NUM > tempvers.txt
-            mvn versions:set -DnewVersion=$(cat tempvers.txt) 
-      - run: mvn -s .circleci/settings.xml -DskipTests clean package
-      - run: mvn -s .circleci/settings.xml -DskipTests -DaltSnapshotDeploymentRepository=nexus::default::$REPO_URL/maven-snapshots/ -DaltReleaseDeploymentRepository=nexus::default::$REPO_URL/maven-releases/ deploy
-   
-```
-
-Build `docker` image for mule-project
-```yml
-      - run:  
-          name: Build application Docker image
-          command: |  
-            cp target/*.zip docker/apps/
-            docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REPO
-            docker build --no-cache -t $DOCKER_REPO/$DOCKER_REPO_ORG/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt) docker
-
-```
-
-Finally, keep and save the created docker image to docker image registory. Example. `Docker Hub`, `JFrog`.
-```yml
-            docker push $DOCKER_REPO/$DOCKER_REPO_ORG/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt)
-```
-
-If your project is `java` project, it will be like
-
-* buld java project
-* remove shapshot version
-* build docker 
-* keep and save docker image registory
+Build the project using maven and deploy artifact without snapshots-version, eg, 1.2.3-SNAPSHOT
    
 ```yml
       - 
@@ -131,13 +95,20 @@ If your project is `java` project, it will be like
           command: "if mvn -q -Dexec.executable=\"echo\" -Dexec.args='${project.version}' --non-recursive exec:exec | grep -q \"SNAPSHOT\"; then mvn versions:set -DremoveSnapshot; fi;\n\
               echo $(mvn -q -Dexec.executable=\"echo\" -Dexec.args='${project.version}' --non-recursive exec:exec)-$(echo $CIRCLE_SHA1 | cut -c -7)-$CIRCLE_BUILD_NUM > tempvers.txt\n\
               mvn versions:set -DnewVersion=$(cat tempvers.txt) \n"    
-      - 
+```
+
+Build docker image
+```yml
+- 
         run: 
+          name: "Build application Docker image"
           command: |
               cp target/*.war docker/app/
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker build --no-cache -t $DOCKER_USER/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt) docker
+```
+Finally, keep and save the created docker image to docker image registory. Example. `Docker Hub`, `JFrog`.
+```yml
               docker push $DOCKER_USER/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt)
-          name: "Build application Docker image"
 ```
 
