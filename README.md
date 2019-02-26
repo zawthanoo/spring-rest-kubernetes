@@ -97,7 +97,8 @@ Build the project using maven and deploy artifact without snapshots-version, eg,
               mvn versions:set -DnewVersion=$(cat tempvers.txt) \n"    
 ```
 
-Build docker image
+Build docker image according to Dockerfile which is under docker directory.
+
 ```yml
 - 
         run: 
@@ -112,3 +113,10 @@ Finally, keep and save the created docker image to docker image registory. Examp
               docker push $DOCKER_USER/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt)
 ```
 
+# 2. Pull/Setup `docker` image
+
+```Dockerfile
+FROM tomcat:8.5.35
+LABEL maintainer="Zaw Than Oo <zawthanoo.1986@gmail.com>"
+COPY ./app/*.war /usr/local/tomcat/webapps
+```
