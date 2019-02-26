@@ -57,7 +57,7 @@ Checkout git project and build remote environment
       - checkout
       - setup_remote_docker
 ```
-Pull/down and cache the dependencies lib. For the first time, there is no cache. It will be download/pull form public repo(Eg, maven-public)
+Pull/down and cache the dependencies lib. There is no cache for firsttime build. It will be download/pull from public repo(Eg, maven-public)
 
 ```yml
       # Download and cache dependencies
@@ -111,7 +111,7 @@ Finally, keep and save the created docker image to docker image registory. Examp
             docker push $DOCKER_REPO/$DOCKER_REPO_ORG/$CIRCLE_PROJECT_REPONAME:$(cat tempvers.txt)
 ```
 
-If your project is java project, it will be like
+If your project is `java` project, it will be like
 
 * buld java project
 * remove shapshot version
