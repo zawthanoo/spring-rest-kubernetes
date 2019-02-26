@@ -3,7 +3,7 @@
 Before setup, we need to prepare to login [circle](https://circleci.com/vcs-authorize/) with `git` account.
 
 1. Go `Add PROJECTS`
-2. Chose you desired project and `setup or follow prject`
+2. Chose you desired project and `setup or follow project`
 3. Prepare environment varaible in project setting. The variable are use in `config.yml`. If you don't want to put credentials info in `config.yml`, use environment variables. Eg:,
 
    - CIRCLE_PROJECT_REPONAME : www.docker-hube.com
@@ -19,8 +19,6 @@ Before setup, we need to prepare to login [circle](https://circleci.com/vcs-auth
 │   │   ├── setting.xml
 │   ├── docker
 │   │   ├── app  
-│   │   │   ├── .gitkeep
-│   │   ├── domains
 │   │   │   ├── .gitkeep
 │   │   ├── Dockerfile
 │   │   └── wrapper.conf
