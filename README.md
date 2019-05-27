@@ -120,3 +120,74 @@ FROM tomcat:8.5.35
 LABEL maintainer="Zaw Than Oo <zawthanoo.1986@gmail.com>"
 COPY ./app/*.war /usr/local/tomcat/webapps
 ```
+
+
+# 3. Deploy on kubernetes cluster
+
+1. Create `registrykey` for docker private registery.
+
+```
+kubectl create secret docker-registry XXX_REG_KEY --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email> -n <your-namespace>
+```
+2. Create `deployment` config. Eg. `spring-deployment.yaml`
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-deployment
+  labels:
+    app: spring-boot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot
+  template:
+    metadata:
+      labels:
+        app: spring-boot
+    spec:
+      containers:
+      - name: spring-boot
+        image: zawthanoo/spring-rest-helloworld:0.1.0-e943d29-21
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: XXX_REG_KEY
+```
+```
+kubectl create -f spring-deployment.yaml
+```
+
+2. TO export as `NodePort`, create `service` config file. Eg: spring-nodeprot.yaml
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-svc
+  labels:
+    name: spring-boot-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 30180
+      name: http
+    - port: 443
+      nodePort: 31443
+      name: https
+  selector:
+    app: spring-boot
+```
+```
+kubectl create -f spring-nodeprot.yaml
+```
+Go browser : http://<ip-address>:8080
+   
+If you don't know `ip-address`, the below command to check `node` name....
+```
+$ kubectl get pods -o wide
+$ <NODE_NAME> status
+```
+![pods-status](/node-status.png)
