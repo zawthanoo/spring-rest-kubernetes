@@ -183,7 +183,7 @@ spec:
 ```
 kubectl create -f spring-nodeprot.yaml
 ```
-Go browser : http://<ip-address>:8080
+Go browser : http://ip-address:8080
    
 If you don't know `ip-address`, the below command to check `node` name....
 ```
