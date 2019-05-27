@@ -6,7 +6,7 @@ Before setup, we need to prepare to login [circle](https://circleci.com/vcs-auth
 2. Chose you desired project and `setup or follow project`
 3. Prepare environment varaible in project setting. The variable are use in `config.yml`. If you don't want to put credentials info in `config.yml`, use environment variables. Eg:,
 
-   - CIRCLE_PROJECT_REPONAME : www.docker-hube.com
+   - CIRCLE_PROJECT_REPONAME : https://hub.docker.com/
    - DOCKER_USER : exampleuser
    - DOCKER_PASS : examplepassword
 
